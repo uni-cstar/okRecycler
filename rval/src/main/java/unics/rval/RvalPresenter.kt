@@ -247,7 +247,7 @@ open class RvalPresenter() : Presenter() {
                 if (!handled && itemKeyBoundaryListener != null) {//边界按键
                     if (!focusSearchOptimization && event.action == KeyEvent.ACTION_DOWN) {
                         //如果没有开启寻焦优化，并且没有处理过按键事件，且设置了边界按键事件，那么先做一下常规寻焦处理
-                        val rv = holder.view.findContainingRecyclerView()
+                        val rv = findPreferredRecyclerView(holder.view)
                             ?: return@setOnKeyListener false
                         val next = FocusFinder.getInstance()
                             .findNextFocus(rv, v, transformFocusDirection(keyCode))
@@ -266,7 +266,7 @@ open class RvalPresenter() : Presenter() {
     private lateinit var focusSearchHelper: GridViewFocusSearchHelper<*>
 
     private inline fun findPreferredRecyclerView(view: View): RecyclerView? {
-        return attachedRecyclerView ?: view.findContainingRecyclerView()
+        return view.findContainingRecyclerView() ?: attachedRecyclerView
     }
 
     /**
@@ -282,7 +282,7 @@ open class RvalPresenter() : Presenter() {
         if (keyCode != KeyEvent.KEYCODE_DPAD_UP && keyCode != KeyEvent.KEYCODE_DPAD_RIGHT && keyCode != KeyEvent.KEYCODE_DPAD_DOWN && keyCode != KeyEvent.KEYCODE_DPAD_LEFT)
             return false
 
-        val rv = viewHolder.view.findContainingRecyclerView() ?: return false
+        val rv = findPreferredRecyclerView(viewHolder.view) ?: return false
         if (rv is BaseGridView) {
             if (rv is VerticalGridView) {
                 if (!::focusSearchHelper.isInitialized || focusSearchHelper.gridView != rv || focusSearchHelper !is VerticalGridViewFocusSearchHelper) {
