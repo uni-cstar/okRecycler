@@ -14,6 +14,8 @@ import androidx.leanback.widget.FocusHighlightHelper
 import androidx.leanback.widget.HorizontalGridView
 import androidx.leanback.widget.VerticalGridView
 import unics.rva.sample.R
+import unics.rval.RvalHorizontalGridView
+import unics.rval.RvalVerticalGridView
 import unics.rval.rval
 import kotlin.random.Random
 
@@ -38,13 +40,17 @@ open class SampleActivity() : Activity() {
         val count = intent.data?.getQueryParameter("count")?.toIntOrNull() ?: 1
         setContentView(intent.data!!.getQueryParameter("layoutId")!!.toInt())
         findViewById<TextView>(R.id.tipText).text = intent.data!!.getQueryParameter("sumary")
+        val focusOpt = intent.data?.getQueryParameter("focusOpt")?.toBooleanStrictOrNull() ?: false
+
         if (type == "1") {
-            val gridView = findViewById<HorizontalGridView>(R.id.gridView)
+            val gridView = findViewById<RvalHorizontalGridView>(R.id.gridView)
             gridView.setNumRows(count)
+            gridView.focusSearchOptimization = focusOpt
             setupGridView(gridView)
         } else {
-            val gridView = findViewById<VerticalGridView>(R.id.gridView)
+            val gridView = findViewById<RvalVerticalGridView>(R.id.gridView)
             gridView.setNumColumns(count)
+            gridView.focusSearchOptimization = focusOpt
             setupGridView(gridView)
         }
     }
@@ -54,7 +60,7 @@ open class SampleActivity() : Activity() {
         repeat(50) {
             val random = Random.nextInt()
             if (random % 2 == 0) {
-                data.add(Text("Text$random"))
+                data.add(Text("Text$it"))
             }else{
                 data.add(Image)
             }
@@ -69,8 +75,9 @@ open class SampleActivity() : Activity() {
                         gravity = Gravity.CENTER
                         layoutParams = ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
+                            120
                         )
+                        setBackgroundResource(R.drawable.text_select)
                     }
                 }
                 itemBind {
@@ -84,8 +91,9 @@ open class SampleActivity() : Activity() {
                         scaleType = ImageView.ScaleType.CENTER_CROP
                         layoutParams = ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
+                            240
                         )
+                        setBackgroundResource(R.drawable.image_select)
                         setImageResource(R.drawable.hellowrold)
                     }
                 }

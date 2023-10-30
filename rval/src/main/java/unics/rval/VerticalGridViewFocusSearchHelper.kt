@@ -10,7 +10,7 @@ import kotlin.math.min
  * Created by Lucio on 2021/11/29.
  * 主要用于多列情况换行寻焦支持
  */
-class VerticalGridViewFocusSearchHelper(view: VerticalGridView) :
+internal class VerticalGridViewFocusSearchHelper(view: VerticalGridView) :
     GridViewFocusSearchHelper<VerticalGridView>(view) {
 
     private var numberRowField: Field? = null

@@ -10,7 +10,7 @@ import kotlin.math.min
  * Create by luochao
  * on 2023/10/24
  */
-class HorizontalGridViewFocusSearchHelper (view: HorizontalGridView) :
+internal class HorizontalGridViewFocusSearchHelper (view: HorizontalGridView) :
     GridViewFocusSearchHelper<HorizontalGridView>(view) {
 
     private var numberRowField: Field? = null

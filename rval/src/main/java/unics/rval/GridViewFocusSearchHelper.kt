@@ -14,11 +14,11 @@ import unics.rva.utils.canTakeFocusCompat
  * @param callback 查询回调，用于判断[BaseGridView]是否已找到下一个焦点位置
  */
 
-abstract class GridViewFocusSearchHelper<T : BaseGridView>(val gridView: T) {
+internal abstract class GridViewFocusSearchHelper<T : BaseGridView>(val gridView: T) {
 
     protected var isRtl: Boolean
-    protected var focusOutFront: Boolean = false
-    protected var focusOutEnd: Boolean = false
+//    protected var focusOutFront: Boolean = false
+//    protected var focusOutEnd: Boolean = false
 
     //是否允许焦点转移
     protected var focusOutSideStart: Boolean = true
@@ -39,8 +39,8 @@ abstract class GridViewFocusSearchHelper<T : BaseGridView>(val gridView: T) {
                 isEnable = false
             } else {
                 isEnable = true
-                focusOutFront = layoutManager.mFlag and GridLayoutManager.PF_FOCUS_OUT_FRONT != 0
-                focusOutEnd = layoutManager.mFlag and GridLayoutManager.PF_FOCUS_OUT_END != 0
+//                focusOutFront = layoutManager.mFlag and GridLayoutManager.PF_FOCUS_OUT_FRONT != 0
+//                focusOutEnd = layoutManager.mFlag and GridLayoutManager.PF_FOCUS_OUT_END != 0
                 focusOutSideStart =
                     layoutManager.mFlag and GridLayoutManager.PF_FOCUS_OUT_SIDE_START != 0
                 focusOutSideEnd =
@@ -122,6 +122,28 @@ abstract class GridViewFocusSearchHelper<T : BaseGridView>(val gridView: T) {
     fun focusSearch(focused: View?, direction: Int): View? {
         if (gridView.isFocusSearchDisabled)
             return null
+
+        if (gridView is VerticalGridView) {
+            //开始侧可以焦点移除，不做处理
+            if (focusOutSideStart && ((!isRtl && direction == View.FOCUS_LEFT) || (isRtl && direction == View.FOCUS_RIGHT))) {
+                return null
+            }
+            //末侧边可以焦点移出，则不用做寻焦处理
+            if (focusOutSideEnd && ((!isRtl && direction == View.FOCUS_RIGHT) || (isRtl && direction == View.FOCUS_LEFT))) {
+                return null
+            }
+        }
+        if (gridView is HorizontalGridView) {
+            //开始侧可以焦点移除，不做处理
+            if (focusOutSideStart && direction == View.FOCUS_UP) {
+                return null
+            }
+            //末侧边可以焦点移出，则不用做寻焦处理
+            if (focusOutSideEnd && direction == View.FOCUS_DOWN) {
+                return null
+            }
+        }
+
         //在gridView中查找下一个可获取焦点的view
         val next = FocusFinder.getInstance().findNextFocus(gridView, focused, direction)
         return if (next == null || next == gridView || next == focused) {
@@ -146,5 +168,14 @@ abstract class GridViewFocusSearchHelper<T : BaseGridView>(val gridView: T) {
 
         internal const val VERTICAL = BaseGridView.VERTICAL
 
+        inline fun <T : BaseGridView> new(gridView: BaseGridView): GridViewFocusSearchHelper<*> {
+            return if (gridView is HorizontalGridView) {
+                HorizontalGridViewFocusSearchHelper(gridView)
+            } else if (gridView is VerticalGridView) {
+                VerticalGridViewFocusSearchHelper(gridView)
+            } else {
+                throw IllegalStateException("不支持的类型$gridView")
+            }
+        }
     }
 }

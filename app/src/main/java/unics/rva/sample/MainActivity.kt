@@ -227,7 +227,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         1,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_side_false,
                         false, summary
                     )
@@ -238,7 +238,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         1,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_side_false,
                         true, summary
                     )
@@ -249,7 +249,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         3,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_side_false,
                         false, summary
                     )
@@ -260,7 +260,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         3,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_side_false,
                         true, summary
                     )
@@ -271,7 +271,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         1,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample,
                         false, summary
                     )
@@ -282,7 +282,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         1,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample,
                         true, summary
                     )
@@ -293,7 +293,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         3,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample,
                         false,summary
                     )
@@ -304,7 +304,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         3,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample,
                         true,summary
                     )
@@ -315,7 +315,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         1,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_all_true,
                         false,summary
                     )
@@ -326,7 +326,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         1,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_all_true,
                         true,summary
                     )
@@ -337,7 +337,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         3,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_all_true,
                         false,summary
                     )
@@ -348,7 +348,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         3,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_all_true,
                         true,summary
                     )
@@ -359,7 +359,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         1,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_all_false,
                         false,summary
                     )
@@ -370,7 +370,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         1,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_all_false,
                         true,summary
                     )
@@ -381,7 +381,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         3,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_all_false,
                         false,summary
                     )
@@ -392,7 +392,7 @@ class MainActivity : Activity() {
                 startActivity(
                     SampleActivity.newIntent(
                         3,
-                        0,
+                        1,
                         R.layout.activity_rval_horizontal_sample_all_false,
                         true,summary
                     )

@@ -27,7 +27,6 @@ class RvalItemBridgeAdapter private constructor(
         presenterSelector
     )
 
-
     override fun setAdapter(adapter: ObjectAdapter?) {
         throw RuntimeException("不允许修改ObjectAdapter，内部已提供实现")
     }
@@ -125,6 +124,7 @@ class RvalItemBridgeAdapter private constructor(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+//        recyclerView.addOnUnhandledKeyEventListener()
         presenterSelector.presenters.forEach {
             if(it is RvalPresenter){
                 it.onAttachedToRecyclerView(recyclerView)

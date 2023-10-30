@@ -46,19 +46,19 @@ open class RvalPresenter() : Presenter() {
     private var itemUnbinder: LrvaViewHolderCallback? = null
     private var itemClicker: EventHolder<OnViewClick>? = null
     private var itemKeyListener: OnViewKeyEvent? = null
-    private var itemKeyBoundaryListener: OnViewKeyEvent? = null
+//    private var itemKeyBoundaryListener: OnViewKeyEvent? = null
     private val itemChildClickersLazy = lazy {
         SparseArray<EventHolder<OnViewClick>>(5)
     }
     private val itemChildClickers: SparseArray<EventHolder<OnViewClick>> by itemChildClickersLazy
     private var itemFocusChanger: OnViewFocusChange? = null
     private var attachedRecyclerView: RecyclerView? = null
-
-    /**
-     * 是否开启寻焦优化
-     *
-     */
-    var focusSearchOptimization: Boolean = false
+//
+//    /**
+//     * 是否开启寻焦优化
+//     *
+//     */
+//    var focusSearchOptimization: Boolean = false
 
     /**
      * 默认获取焦点的item位置（只在第一次显示该item时请求焦点）
@@ -190,12 +190,12 @@ open class RvalPresenter() : Presenter() {
         this.itemKeyListener = block
     }
 
-    /**
-     * 按键边界回调：在指定方向上找不到可获取焦点时回调
-     */
-    fun itemKeyEventBoundary(block: OnViewKeyEvent?) {
-        this.itemKeyBoundaryListener = block
-    }
+//    /**
+//     * 按键边界回调：在指定方向上找不到可获取焦点时回调
+//     */
+//    fun itemKeyEventBoundary(block: OnViewKeyEvent?) {
+//        this.itemKeyBoundaryListener = block
+//    }
 
     private fun bindHolderEvents(holder: RvalViewHolder) {
         itemClicker?.let { it ->
@@ -232,94 +232,101 @@ open class RvalPresenter() : Presenter() {
             }
         }
 
-        if (focusSearchOptimization || itemKeyListener != null || itemKeyBoundaryListener != null) {
+        if (itemKeyListener != null) {
             holder.view.setOnKeyListener { v, keyCode, event ->
-                var handled = itemKeyListener?.invoke(holder, keyCode, event) ?: false
-                try {
-                    if (!handled && focusSearchOptimization) {
-                        //寻焦优化
-                        handled = optFocusSearch(holder, keyCode, event)
-                    }
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                }
-
-                if (!handled && itemKeyBoundaryListener != null) {//边界按键
-                    if (!focusSearchOptimization && event.action == KeyEvent.ACTION_DOWN) {
-                        //如果没有开启寻焦优化，并且没有处理过按键事件，且设置了边界按键事件，那么先做一下常规寻焦处理
-                        val rv = findPreferredRecyclerView(holder.view)
-                            ?: return@setOnKeyListener false
-                        val next = FocusFinder.getInstance()
-                            .findNextFocus(rv, v, transformFocusDirection(keyCode))
-                        if (next != null) {
-                            next.requestFocus()
-                            return@setOnKeyListener true
-                        }
-                    }
-                    handled = itemKeyBoundaryListener?.invoke(holder, keyCode, event) ?: false
-                }
-                handled
+                itemKeyListener?.invoke(holder, keyCode, event) ?: false
             }
         }
+//
+//        if (focusSearchOptimization || itemKeyListener != null || itemKeyBoundaryListener != null) {
+//            holder.view.setOnKeyListener { v, keyCode, event ->
+//                var handled = itemKeyListener?.invoke(holder, keyCode, event) ?: false
+//                try {
+//                    if (!handled && focusSearchOptimization) {
+//                        //寻焦优化
+//                        handled = optFocusSearch(holder, keyCode, event)
+//                    }
+//                } catch (e: Throwable) {
+//                    e.printStackTrace()
+//                }
+//
+//                if (!handled && itemKeyBoundaryListener != null) {//边界按键
+//                    if (!focusSearchOptimization && event.action == KeyEvent.ACTION_DOWN) {
+//                        //如果没有开启寻焦优化，并且没有处理过按键事件，且设置了边界按键事件，那么先做一下常规寻焦处理
+//                        val rv = findPreferredRecyclerView(holder.view)
+//                            ?: return@setOnKeyListener false
+//                        val next = FocusFinder.getInstance()
+//                            .findNextFocus(rv, v, transformFocusDirection(keyCode))
+//                        if (next != null) {
+//                            next.requestFocus()
+//                            return@setOnKeyListener true
+//                        }
+//                    }
+//                    handled = itemKeyBoundaryListener?.invoke(holder, keyCode, event) ?: false
+//                }
+//                handled
+//            }
+//        }
     }
+//
+//    private lateinit var focusSearchHelper: GridViewFocusSearchHelper<*>
+//
+//    private inline fun findPreferredRecyclerView(view: View): RecyclerView? {
+//        return view.findContainingRecyclerView() ?: attachedRecyclerView
+//    }
 
-    private lateinit var focusSearchHelper: GridViewFocusSearchHelper<*>
+//    /**
+//     * 焦点寻优优化
+//     * todo 寻焦优化通过Presenter#itemView#keylistener监听实现不是很合理，应该通过recycleview处理更好
+//     */
+//    private fun optFocusSearch(
+//        viewHolder: RvalViewHolder,
+//        keyCode: Int,
+//        event: KeyEvent
+//    ): Boolean {
+//        if (!focusSearchOptimization || event.action != KeyEvent.ACTION_DOWN)
+//            return false
+//        if (keyCode != KeyEvent.KEYCODE_DPAD_UP && keyCode != KeyEvent.KEYCODE_DPAD_RIGHT && keyCode != KeyEvent.KEYCODE_DPAD_DOWN && keyCode != KeyEvent.KEYCODE_DPAD_LEFT)
+//            return false
+//
+//        val rv = findPreferredRecyclerView(viewHolder.view) ?: return false
+//        if (rv is BaseGridView) {
+//            if (rv is VerticalGridView) {
+//                if (!::focusSearchHelper.isInitialized || focusSearchHelper.gridView != rv || focusSearchHelper !is VerticalGridViewFocusSearchHelper) {
+//                    focusSearchHelper = VerticalGridViewFocusSearchHelper(rv)
+//                }
+//            } else if (rv is HorizontalGridView) {
+//                if (!::focusSearchHelper.isInitialized || focusSearchHelper.gridView != rv || focusSearchHelper !is HorizontalGridViewFocusSearchHelper) {
+//                    focusSearchHelper = HorizontalGridViewFocusSearchHelper(rv)
+//                }
+//            }
+//            val next = focusSearchHelper.focusSearch(
+//                viewHolder.view,
+//                transformFocusDirection(keyCode)
+//            )
+//            if (next != null) {
+//                next.requestFocus()
+//                return true
+//            }
+//        } else {
+//            val next = FocusFinder.getInstance()
+//                .findNextFocus(rv, viewHolder.view, transformFocusDirection(keyCode))
+//            if (next != null) {
+//                next.requestFocus()
+//                return true
+//            }
+//        }
+//        return false
+//    }
 
-    private inline fun findPreferredRecyclerView(view: View): RecyclerView? {
-        return view.findContainingRecyclerView() ?: attachedRecyclerView
-    }
-
-    /**
-     * 焦点寻优优化
-     */
-    private fun optFocusSearch(
-        viewHolder: RvalViewHolder,
-        keyCode: Int,
-        event: KeyEvent
-    ): Boolean {
-        if (!focusSearchOptimization || event.action != KeyEvent.ACTION_DOWN)
-            return false
-        if (keyCode != KeyEvent.KEYCODE_DPAD_UP && keyCode != KeyEvent.KEYCODE_DPAD_RIGHT && keyCode != KeyEvent.KEYCODE_DPAD_DOWN && keyCode != KeyEvent.KEYCODE_DPAD_LEFT)
-            return false
-
-        val rv = findPreferredRecyclerView(viewHolder.view) ?: return false
-        if (rv is BaseGridView) {
-            if (rv is VerticalGridView) {
-                if (!::focusSearchHelper.isInitialized || focusSearchHelper.gridView != rv || focusSearchHelper !is VerticalGridViewFocusSearchHelper) {
-                    focusSearchHelper = VerticalGridViewFocusSearchHelper(rv)
-                }
-            } else if (rv is HorizontalGridView) {
-                if (!::focusSearchHelper.isInitialized || focusSearchHelper.gridView != rv || focusSearchHelper !is HorizontalGridViewFocusSearchHelper) {
-                    focusSearchHelper = HorizontalGridViewFocusSearchHelper(rv)
-                }
-            }
-            val next = focusSearchHelper.focusSearch(
-                viewHolder.view,
-                transformFocusDirection(keyCode)
-            )
-            if (next != null) {
-                next.requestFocus()
-                return true
-            }
-        } else {
-            val next = FocusFinder.getInstance()
-                .findNextFocus(rv, viewHolder.view, transformFocusDirection(keyCode))
-            if (next != null) {
-                next.requestFocus()
-                return true
-            }
-        }
-        return false
-    }
-
-    private fun transformFocusDirection(keyCode: Int): Int {
-        return when (keyCode) {
-            KeyEvent.KEYCODE_DPAD_UP -> View.FOCUS_UP
-            KeyEvent.KEYCODE_DPAD_LEFT -> View.FOCUS_LEFT
-            KeyEvent.KEYCODE_DPAD_RIGHT -> View.FOCUS_RIGHT
-            else -> View.FOCUS_DOWN
-        }
-    }
+//    private fun transformFocusDirection(keyCode: Int): Int {
+//        return when (keyCode) {
+//            KeyEvent.KEYCODE_DPAD_UP -> View.FOCUS_UP
+//            KeyEvent.KEYCODE_DPAD_LEFT -> View.FOCUS_LEFT
+//            KeyEvent.KEYCODE_DPAD_RIGHT -> View.FOCUS_RIGHT
+//            else -> View.FOCUS_DOWN
+//        }
+//    }
 
     internal fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         attachedRecyclerView = recyclerView

@@ -1,6 +1,7 @@
 package unics.rval
 
 
+import android.annotation.SuppressLint
 import androidx.annotation.LayoutRes
 import androidx.leanback.widget.BaseGridView
 import androidx.leanback.widget.Presenter
@@ -68,3 +69,12 @@ fun RecyclerView.rvalSingle(presenterSelector: PresenterSelector): RvalItemBridg
  * 获取绑定的适配器
  */
 val RecyclerView.rval: RvalItemBridgeAdapter get() = this.adapter as RvalItemBridgeAdapter
+
+/**
+ * 使用居中对齐（选中的item在中间）
+ */
+@SuppressLint("RestrictedApi")
+fun BaseGridView.applyCenterAlignment(){
+    focusScrollStrategy = BaseGridView.FOCUS_SCROLL_ALIGNED
+    windowAlignment = BaseGridView.WINDOW_ALIGN_NO_EDGE
+}
