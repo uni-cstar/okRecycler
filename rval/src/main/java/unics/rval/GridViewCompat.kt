@@ -1,7 +1,10 @@
 package androidx.leanback.widget
 
+import android.os.SystemClock
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import unics.rval.RvalBoundaryKeyListener
 import unics.rval.shakeX
 import unics.rval.shakeY
@@ -15,8 +18,19 @@ internal class GridViewCompat<T : BaseGridView>(
     private val callback: Callback
 ) {
 
+    companion object{
+        /**
+         * 推荐的按键分发时间间隔
+         */
+        const val PREFERRED_DISPATCH_KEY_EVENT_TIME = 80L
+    }
+
     internal interface Callback {
+
         fun superFocusSearch(focused: View?, direction: Int): View?
+
+        fun superDispatchKeyEvent(event: KeyEvent): Boolean
+
     }
 
     private val TAG = "GridViewCompat"
@@ -38,10 +52,32 @@ internal class GridViewCompat<T : BaseGridView>(
      */
     var boundaryShakeEnable: Boolean = true
 
+    /**
+     * keyevent 分发的最小间隔时间
+     */
+    var keyEventDispatchMinTime: Long = -1
+
+    private var lastKeyEventDispatchTime:Long = -1
+
+    fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        val updateTime = SystemClock.uptimeMillis()
+        return if (keyEventDispatchMinTime > 0
+            && event.action == KeyEvent.ACTION_DOWN
+            && event.repeatCount != 0
+            && updateTime - lastKeyEventDispatchTime < keyEventDispatchMinTime
+        ) {
+            Log.i(TAG, "dispatchKeyEvent: 忽略keyEvent ${gridView.scrollState == RecyclerView.SCROLL_STATE_IDLE}")
+            true
+        } else {
+            Log.i(TAG, "dispatchKeyEvent: 触发super ${gridView.scrollState == RecyclerView.SCROLL_STATE_IDLE}")
+            lastKeyEventDispatchTime = updateTime
+            callback.superDispatchKeyEvent(event)
+        }
+    }
+
     fun focusSearch(focused: View?, direction: Int): View? {
         val next = findNextFocus(focused, direction)
         if (next == null || next == focused) {
-
             logd { "执行shake动画 ${gridView.getChildAdapterPosition(focused!!)} next=$next focused=$focused" }
             if (boundaryShakeEnable) {
                 handleBoundaryAnimation(focused, direction)

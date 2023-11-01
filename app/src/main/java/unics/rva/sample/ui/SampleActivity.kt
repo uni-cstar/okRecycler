@@ -45,11 +45,13 @@ open class SampleActivity() : Activity() {
         if (type == "1") {
             val gridView = findViewById<RvalHorizontalGridView>(R.id.gridView)
             gridView.setNumRows(count)
+            gridView.applyPreferredKeyEventDispatchMinTime()
             gridView.focusSearchOptimization = focusOpt
             setupGridView(gridView)
         } else {
             val gridView = findViewById<RvalVerticalGridView>(R.id.gridView)
             gridView.setNumColumns(count)
+            gridView.applyPreferredKeyEventDispatchMinTime()
             gridView.focusSearchOptimization = focusOpt
             setupGridView(gridView)
         }
