@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+
+    >
+<!--    android:insetLeft="-60px"-->
+<!--    android:insetTop="-38px"-->
+<!--    android:insetRight="-60px"-->
+<!--    android:insetBottom="-80px"-->
+    <layer-list
+        android:paddingLeft="-55px"
+        android:paddingTop="-33px"
+        android:paddingRight="-55px"
+        android:paddingBottom="-75px">
+
+<!--            <item>-->
+<!--                <shape>-->
+<!--                    <solid android:color="@android:color/holo_blue_bright" />-->
+<!--                </shape>-->
+<!--            </item>-->
+<!--        <item-->
+<!--            android:left="-100px">-->
+<!--            <shape>-->
+<!--                <solid android:color="#1aff00ff" />-->
+<!--            </shape>-->
+<!--        </item>-->
+<!--        android:bottom="-80px"-->
+<!--        android:left="-60px"-->
+<!--        android:right="-60px"-->
+<!--        android:top="-38px"-->
+
+        <item
+            android:left="-55px"
+            android:top="-33px"
+            android:right="-55px"
+            android:bottom="-75px"
+            android:drawable="@drawable/bg_shadow_without_padding">
+        </item>
+
+        <!--    <item-->
+        <!--        android:bottom="-70px"-->
+        <!--        android:left="-50px"-->
+        <!--        android:right="-50px"-->
+        <!--        android:top="-28px">-->
+        <!--        <shape>-->
+        <!--            <solid android:color="@android:color/transparent" />-->
+        <!--            <padding-->
+        <!--                android:bottom="-70px"-->
+        <!--                android:left="-50px"-->
+        <!--                android:right="-50px"-->
+        <!--                android:top="-28px"/>-->
+        <!--        </shape>-->
+        <!--    </item>-->
+
+        <!--    <item android:drawable="@drawable/bg_shadow"/>-->
+        <!--    <item>-->
+        <!--        <inset-->
+        <!--            android:bottom="-70px"-->
+        <!--            android:drawable="@drawable/bg_shadow"-->
+        <!--            android:left="-50px"-->
+        <!--            android:right="-50px"-->
+        <!--            android:top="-28px" />-->
+        <!--    </item>-->
+
+        <!--        <item android:drawable="@drawable/bg_shadow"/>-->
+        <item>
+            <shape>
+                <stroke
+                    android:width="10px"
+                    android:color="#ff0000" />
+                <corners android:radius="20dp" />
+<!--                <padding-->
+<!--                    android:bottom="5px"-->
+<!--                    android:left="5px"-->
+<!--                    android:right="5px"-->
+<!--                    android:top="5px" />-->
+            </shape>
+
+        </item>
+
+
+    </layer-list>
+</inset>

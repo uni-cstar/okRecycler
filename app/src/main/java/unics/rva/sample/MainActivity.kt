@@ -1,15 +1,18 @@
 package unics.rva.sample
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import unics.rva.sample.ui.EffectSampleActivity
 import unics.rva.sample.ui.SampleActivity
 
 class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        startActivity(Intent(this, EffectSampleActivity::class.java))
         findViewById<View>(R.id.v1).setOnClickListener(::onViewClick)
         findViewById<View>(R.id.v11).setOnClickListener(::onViewClick)
         findViewById<View>(R.id.v12).setOnClickListener(::onViewClick)
