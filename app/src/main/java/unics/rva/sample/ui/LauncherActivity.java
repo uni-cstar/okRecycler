@@ -5,7 +5,9 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -19,6 +21,8 @@ public class LauncherActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
         Button btn = new Button(this);
         btn.setText("启动乐家桌面");
         btn.setOnClickListener(new View.OnClickListener() {
@@ -34,6 +38,19 @@ public class LauncherActivity extends Activity {
                 }
             }
         });
-        setContentView(btn);
+        linearLayout.addView(btn);
+        addBtn(linearLayout, "启动测试界面", v -> {
+            Intent it = new Intent(LauncherActivity.this, EffectSampleActivity.class);
+            startActivity(it);
+        });
+
+        setContentView(linearLayout);
+    }
+
+    private void addBtn(ViewGroup group,String text, View.OnClickListener onClick){
+        Button btn = new Button(this);
+        btn.setText(text);
+        btn.setOnClickListener(onClick);
+        group.addView(btn);
     }
 }

@@ -1,15 +1,24 @@
 package unics.rva.utils
 
-import android.annotation.SuppressLint
 import android.util.SparseArray
 import android.view.View
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
-import java.lang.reflect.Method
 
 /**
  * Create by luochao
  * on 2023/10/25
+ * RV相关的工具函数
  */
+
+const val NO_POSITION = RecyclerView.NO_POSITION
+
+/**
+ * 设置是否使用Item改变动画：也就是调用Adapter#notifyXX之后刷新列表，是否执行动画（默认是闪一下）
+ */
+fun RecyclerView.setChangeAnimationsEnabled(isEnable: Boolean) {
+    (itemAnimator as? DefaultItemAnimator)?.supportsChangeAnimations = isEnable
+}
 
 /**
  * 查找包含该view得RecyclerView，通常用于ViewHolder中view查找所属的RecyclerView
@@ -32,31 +41,32 @@ fun View.findContainingViewHolder(): RecyclerView.ViewHolder? {
     return recyclerView.findContainingViewHolder(this)
 }
 
-
 /**
- * 是否可以获取焦点
+ * 查找该view在recyclerview所持有的child中的位置
  */
-fun View.canTakeFocusCompat(): Boolean {
-    return try {
-        canTakeFocusReflection()
-    } catch (e: Throwable) {
-        this.visibility == View.VISIBLE && this.isFocusable && this.isEnabled
+fun RecyclerView.findImmediateChildIndex(view: View?): Int {
+    if (view == null || view == this)
+        return NO_POSITION
+
+    val itemView = this.findContainingItemView(view)
+    if (itemView != null) {
+        var i = 0
+        val count: Int = this.childCount
+        while (i < count) {
+            if (this.getChildAt(i) == view) {
+                return i
+            }
+            i++
+        }
     }
+    return NO_POSITION
 }
 
-private var canTakeFocusMethod: Method? = null
-
 /**
- * 反射调用view是否可以获取焦点
+ * 是否正在滑动中
  */
-@SuppressLint("SoonBlockedPrivateApi")
-@Throws(NoSuchMethodException::class, SecurityException::class)
-fun View.canTakeFocusReflection(): Boolean {
-    val method = canTakeFocusMethod ?: View::class.java.getDeclaredMethod("canTakeFocus").also {
-        it.isAccessible = true
-        canTakeFocusMethod = it
-    }
-    return method.invoke(this) as Boolean
+fun RecyclerView.isScrolling(): Boolean {
+    return scrollState != RecyclerView.SCROLL_STATE_IDLE
 }
 
 inline fun <T> SparseArray<T>.forEach(action: (key: Int, value: T) -> Unit) {

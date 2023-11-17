@@ -50,7 +50,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.EffectSampleActivity"/>
+        <activity android:name=".ui.EffectSampleActivity"
+            android:screenOrientation="landscape"/>
 
     </application>
 

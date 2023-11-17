@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Rva" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Rva" parent="Theme.AppCompat.NoActionBar" >
+        <item name="effectDrawableStyle">@style/DefaultEffectDrawable</item>
+    </style>
+
+    <style name="DefaultEffectDrawable">
+        <item name="ed_ninePathSrc">@drawable/shadow_default</item>
+    </style>
 </resources>
