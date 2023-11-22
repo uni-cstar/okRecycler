@@ -1,4 +1,4 @@
-package unics.leanback.effect;
+package unics.okeffect;
 
 import android.app.Activity;
 import android.content.Context;
@@ -21,18 +21,35 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Px;
 import androidx.annotation.StyleRes;
 
+import unics.leanback.effect.R;
+
 /**
  * Create by luochao
  * on 2023/11/13
  * <p>
- * 使用的注意事项：所在的ViewGroup必须设置clipChildren = false
+ * 使用说明：
+ * 1、（尤其重要）要想效果显示出来，效果所显示的区域关联的父级视图必须设置clipChildren = false
+ * 2、（最优建议）建议采用.9图做阴影效果，性能更加（不用关闭硬件加速）
+ * 3、虽然边框可以跟.9图搭配使用，但是建议如果采用了.9图，边框效果最好是做在图上，没必要在结合绘制的边框
+ * 4、采用自定义Drawable绘制的阴影效果，必须关闭硬件加速（这里有个疑惑点：如果多个父级ViewGroup调用setLayerType(View.LAYER_TYPE_SOFTWARE, null)之后，绘制存在异常，待进一步确认；为避免该问题出现，最好就让某个比较合适的父布局设置即可）
+ * 5、（最优建议）采用自定义Drawable绘制边框效果时，如果边框很粗，可能会造成边框的绘制效果，建议开启边框绘制优化（默认已开启自动优化：会根据边框的宽度启动优化策略）
  */
 public class Effects {
 
     public static final int[][] FOCUSED_PRESSED_STATES = new int[][]{new int[]{android.R.attr.state_focused}, new int[]{}};
 
+    static final boolean DEFAULT_ENABLE_OPT_OUT_CORNER = true;
+
     @StyleRes
-    public static  int defaultEffectDrawableStyleRes = 0;
+    public static int defaultEffectDrawableStyleRes = 0;
+
+    static boolean mAutoOptStrokeCorner = true;
+
+    static final int STOKE_THICK_LIMIT = 6;
+
+    public static void setAutoOptStrokeCorner(boolean enable) {
+        mAutoOptStrokeCorner = enable;
+    }
 
     /**
      * 基于.9图创建效果Drawable
@@ -85,26 +102,33 @@ public class Effects {
 
     static Builder withAttrs(TypedArray ta) {
         Builder builder;
-        Drawable npd = ta.getDrawable(R.styleable.EffectDrawable_ed_ninePathSrc);
-        if (!(npd instanceof NinePatchDrawable)) {
+        boolean forceDraw = ta.getBoolean(R.styleable.EffectDrawable_ed_useDraw, false);
+        if (forceDraw) {
             builder = withDraw();
         } else {
-            builder = withNinePath((NinePatchDrawable) npd);
+            Drawable npd = ta.getDrawable(R.styleable.EffectDrawable_ed_ninePathSrc);
+            if (!(npd instanceof NinePatchDrawable)) {
+                builder = withDraw();
+            } else {
+                builder = withNinePath((NinePatchDrawable) npd);
+            }
         }
         builder.loadAttrs(ta);
         return builder;
     }
 
-    public static void applyInjectFactory2(@NonNull Activity activity){
-        applyInjectFactory2(activity,null);
+    public static void applyInjectFactory2(@NonNull Activity activity) {
+        applyInjectFactory2(activity, null);
     }
+
     /**
      * 绑定自动属性注入工厂；必须在调用super.{@link Activity#onCreate(Bundle)}方法之前调用该方法
+     *
      * @param activity
      * @param custom
      */
-    public static void applyInjectFactory2(@NonNull Activity activity,@Nullable LayoutInflater.Factory2 custom){
-        EffectInjectFactory2 factory2 = new EffectInjectFactory2(activity,custom);
+    public static void applyInjectFactory2(@NonNull Activity activity, @Nullable LayoutInflater.Factory2 custom) {
+        EffectInjectFactory2 factory2 = new EffectInjectFactory2(activity, custom);
         activity.getLayoutInflater().setFactory2(factory2);
     }
 
@@ -112,9 +136,11 @@ public class Effects {
 
         float mStrokeSize;
         int mStrokeColor;
+        boolean mOptStrokeCorner;
         float mContentGap;
         float mCornerRadius;
         float[] mCornerRadii;
+
 
         @CallSuper
         public T loadAttrs(TypedArray ta) {
@@ -164,6 +190,17 @@ public class Effects {
          */
         public T setStrokeColor(@ColorInt int color) {
             mStrokeColor = color;
+            return (T) this;
+        }
+
+        /**
+         * 是否设置优化边框圆角处的绘制
+         *
+         * @param enable
+         * @return
+         */
+        public T setOptStrokeCorner(boolean enable) {
+            mOptStrokeCorner = enable;
             return (T) this;
         }
 

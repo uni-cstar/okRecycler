@@ -49,7 +49,7 @@ android {
 dependencies {
     implementation project(path: ':rva')
     implementation project(path: ':rval')
-    implementation project(path: ':tv-focus')
+    implementation project(path: ':okEffect')
     implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
 

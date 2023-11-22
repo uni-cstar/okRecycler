@@ -1,12 +1,11 @@
 package unics.rva.sample.ui
 
-import android.app.Activity
 import android.graphics.Color
 import android.graphics.drawable.NinePatchDrawable
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import unics.leanback.effect.Effects
+import unics.okeffect.Effects
 import unics.rva.sample.R
 
 /**
@@ -96,14 +95,15 @@ class EffectSampleActivity : AppCompatActivity() {
                 .buildFocusSelectorDrawable()
         //阴影 + 边框
         view55.background = Effects.withDraw().setShadow(20f, 20f, 20f, 40f, Color.BLACK)
-            .setCornerRadius(24f)
-            .setStroke(100f, Color.RED).buildFocusSelectorDrawable()
+            .setCornerRadius(10f)
+            .setContentCap(30f)
+            .setStroke(20f, Color.RED).buildFocusSelectorDrawable()
 
         //异性圆角 + 阴影 + 边框 + contentGap
         view66.background = Effects.withDraw()
             .setShadow(20f, Color.CYAN)
             .setCornerRadii(floatArrayOf(20f, 20f, 0f, 0f, 20f, 20f, 0f, 0f))
-            .setStroke(250f, Color.MAGENTA)
+            .setStroke(10f, Color.MAGENTA)
             .setContentCap(10f)
             .buildFocusSelectorDrawable()
 

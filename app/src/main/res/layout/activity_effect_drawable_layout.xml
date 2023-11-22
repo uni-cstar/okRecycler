@@ -229,7 +229,6 @@
                 </FrameLayout>
             </FrameLayout>
 
-
         </LinearLayout>
 
         <LinearLayout
@@ -247,6 +246,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 app:ed_inject="true"
+                app:ed_useDraw="true"
                 app:ed_shadowColor="@color/lb_basic_card_bg_color"
                 app:ed_shadowSize="@dimen/lb_action_icon_margin">
 
@@ -266,6 +266,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 app:ed_inject="true"
+                app:ed_useDraw="true"
                 app:ed_shadowColor="@color/lb_basic_card_bg_color"
                 app:ed_shadowSize="@dimen/lb_action_icon_margin"
                 app:ed_strokeColor="#ff00ff"
@@ -288,8 +289,6 @@
                 android:focusableInTouchMode="true"
                 app:ed_inject="true"
                 app:ed_ninePathSrc="@drawable/shadow_112339"
-                app:ed_shadowColor="@color/lb_basic_card_bg_color"
-                app:ed_shadowSize="@dimen/lb_action_icon_margin"
                 app:ed_strokeColor="#ff00ff"
                 app:ed_strokeSize="2dp">
 

@@ -1,12 +1,7 @@
-package unics.leanback.effect;
+package unics.okeffect;
 
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
-import android.os.Build;
-
-import java.lang.reflect.Field;
 
 /**
  * Create by luochao
@@ -16,6 +11,41 @@ import java.lang.reflect.Field;
 interface EffectDrawableFactory<T extends EffectParams> {
 
     Drawable create(T params);
+
+    static ShadowEffect createShadowEffect(EffectParams.DrawEffectParams params) {
+        return createShadowEffect(params, false, 0f);
+    }
+
+    static ShadowEffect createShadowEffect(EffectParams.DrawEffectParams params, boolean optShadowCorner, float optShadowSize) {
+        ShadowEffect drawable = new ShadowEffect(params.getShadowLeft(), params.getShadowTop(), params.getShadowRight(), params.getShadowBottom());
+        drawable.setColor(params.getShadowColor());
+        float[] radii = params.getCornerRadii();
+        if (radii != null && radii.length > 0) {
+            drawable.setCornerRadii(radii);
+        } else {
+            drawable.setCornerRadius(params.getCornerRadius());
+        }
+        drawable.setOptShadowCorner(optShadowCorner, optShadowSize);
+        return drawable;
+    }
+
+    static StrokeEffect createStrokeEffect(EffectParams params) {
+        return createStrokeEffect(params, Effects.DEFAULT_ENABLE_OPT_OUT_CORNER);
+    }
+
+    static StrokeEffect createStrokeEffect(EffectParams params, boolean optOutCorner) {
+        StrokeEffect drawable = new StrokeEffect(params.getStrokeSize());
+        drawable.setOptOutCorner(optOutCorner);
+        drawable.setOptCorner(isOptStrokeCorner(params));
+        drawable.setColor(params.getStrokeColor());
+        float[] radii = params.getCornerRadii();
+        if (radii != null && radii.length > 0) {
+            drawable.setCornerRadii(radii);
+        } else {
+            drawable.setCornerRadius(params.getCornerRadius());
+        }
+        return drawable;
+    }
 
     static Drawable createEffectDrawable(Drawable content, EffectParams params) {
         float strokeSize = params.getStrokeSize();
@@ -42,31 +72,8 @@ interface EffectDrawableFactory<T extends EffectParams> {
             Drawable content;
             int strokeSize = (int) params.getStrokeSize();
             if (strokeSize > 0) {
-                GradientDrawable strokeDrawable = new GradientDrawable();
-                strokeDrawable.setStroke(strokeSize, params.getStrokeColor());
-                if (params.getCornerRadius() > 0) {
-                    strokeDrawable.setCornerRadius(params.getCornerRadius());
-                }
-                if (params.getCornerRadii() != null) {
-                    strokeDrawable.setCornerRadii(params.getCornerRadii());
-                }
-                try {
-                    if (Build.VERSION.SDK_INT >= 29) {
-                        strokeDrawable.setPadding(strokeSize, strokeSize, strokeSize, strokeSize);
-                    } else {
-                        Field paddingField = GradientDrawable.class.getDeclaredField("mPadding");
-                        paddingField.setAccessible(true);
-                        Rect rect = (Rect) paddingField.get(strokeDrawable);
-                        if (rect != null) {
-                            rect.set(strokeSize, strokeSize, strokeSize, strokeSize);
-                        } else {
-                            paddingField.set(strokeDrawable, new Rect(strokeSize, strokeSize, strokeSize, strokeSize));
-                        }
-                    }
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-                content = new LayerDrawable(new Drawable[]{params.getDrawable(), strokeDrawable});
+                //.9图的边框不用优化外边框圆角，这样子内边框和外边框的圆角是一样大的，就刚好能够跟.9切合
+                content = new LayerDrawable(new Drawable[]{params.getDrawable(), createStrokeEffect(params, false)});
             } else {
                 content = params.getDrawable();
             }
@@ -84,38 +91,14 @@ interface EffectDrawableFactory<T extends EffectParams> {
             return Draw.SingleTone.mInstance;
         }
 
-        private static ShadowEffect createShadowEffect(EffectParams.DrawEffectParams params) {
-            ShadowEffect drawable = new ShadowEffect(params.getShadowLeft(), params.getShadowTop(), params.getShadowRight(), params.getShadowBottom());
-            drawable.setColor(params.getShadowColor());
-            float[] radii = params.getCornerRadii();
-            if (radii != null && radii.length > 0) {
-                drawable.setCornerRadii(radii);
-            } else {
-                drawable.setCornerRadius(params.getCornerRadius());
-            }
-            return drawable;
-        }
-
-        private static StrokeEffect createStrokeEffect(EffectParams.DrawEffectParams params) {
-            StrokeEffect drawable = new StrokeEffect(params.getStrokeSize());
-            drawable.setColor(params.getStrokeColor());
-            float[] radii = params.getCornerRadii();
-            if (radii != null && radii.length > 0) {
-                drawable.setCornerRadii(radii);
-            } else {
-                drawable.setCornerRadius(params.getCornerRadius());
-            }
-            return drawable;
-        }
-
         @Override
         public Drawable create(EffectParams.DrawEffectParams params) {
             boolean hasShadow = params.getShadowLeft() > 0 || params.getShadowTop() > 0 || params.getShadowRight() > 0 || params.getShadowBottom() > 0;
             boolean hasStroke = params.getStrokeSize() > 0;
             Drawable content;
             if (hasShadow && hasStroke) {
-                //有阴影有边框
-                ShadowEffect shadow = createShadowEffect(params);
+                //有阴影有边框:阴影跟边框同时存在的情况下，阴影根据边框是否绘制优化来决定是否进行绘制优化
+                ShadowEffect shadow = createShadowEffect(params, isOptStrokeCorner(params), params.getStrokeSize() / 2f);
                 StrokeEffect stroke = createStrokeEffect(params);
                 content = new LayerDrawable(new Drawable[]{shadow, stroke});
             } else if (hasShadow) {
@@ -132,4 +115,8 @@ interface EffectDrawableFactory<T extends EffectParams> {
         }
     }
 
+    static boolean isOptStrokeCorner(EffectParams params) {
+        //如果设置了边框圆角优化或者开启了自动优化并且边框超过了阈值，则执行边框优化
+        return params.optStrokeCorner() || (Effects.mAutoOptStrokeCorner && params.getStrokeSize() > Effects.STOKE_THICK_LIMIT);
+    }
 }

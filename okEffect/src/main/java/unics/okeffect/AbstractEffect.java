@@ -1,4 +1,4 @@
-package unics.leanback.effect;
+package unics.okeffect;
 
 import android.content.res.Resources;
 import android.graphics.ColorFilter;
@@ -140,6 +140,9 @@ abstract class AbstractEffect<T extends AbstractEffect.AbstractState> extends Dr
             }
         }
 
+        /**
+         * 是否存在圆角
+         */
         boolean isRoundedShape() {
             return mRadius > 0 || (mRadiusArray != null && mRadiusArray.length > 0);
         }

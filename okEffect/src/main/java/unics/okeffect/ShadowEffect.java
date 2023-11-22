@@ -1,4 +1,4 @@
-package unics.leanback.effect;
+package unics.okeffect;
 
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
@@ -59,6 +59,16 @@ final class ShadowEffect extends AbstractEffect<ShadowEffect.ShadowState> {
     public void setShadowSize(int left, int top, int right, int bottom) {
         mState.setShadowSize(left, top, right, bottom);
         mPathIsDirty = true;
+        invalidateSelf();
+    }
+
+    void setOptShadowCorner(boolean enable, float optSize) {
+        if (mState.mOptShadowCorner == enable && mState.mOptShadowSize == optSize)
+            return;
+        mState.mOptShadowCorner = enable;
+        mState.mOptShadowSize = optSize;
+        mPathIsDirty = true;
+        invalidateSelf();
     }
 
     @Override
@@ -87,11 +97,11 @@ final class ShadowEffect extends AbstractEffect<ShadowEffect.ShadowState> {
             Effects.log("ShadowEffect#draw: buildPathIfDirty=" + st.mRectF);
             st.mPath.rewind();
             Rect bounds = getBounds();
-            float left = bounds.left + mState.mShadowLeft;
-            float top = bounds.top + mState.mShadowTop;
-            float right = bounds.right - mState.mShadowRight;
-            float bottom = bounds.bottom - mState.mShadowBottom;
-
+            float optOffset = st.calShadowInset();
+            float left = bounds.left + st.mShadowLeft + optOffset;
+            float top = bounds.top + st.mShadowTop + optOffset;
+            float right = bounds.right - st.mShadowRight - optOffset;
+            float bottom = bounds.bottom - st.mShadowBottom - optOffset;
             st.mRectF.set(left, top, right, bottom);
             //必须使用这种方式，否则在某些情况下会出现中间有个阴影色的色块
             if (st.mRadiusArray != null && st.mRadiusArray.length > 0) {
@@ -116,12 +126,16 @@ final class ShadowEffect extends AbstractEffect<ShadowEffect.ShadowState> {
         float mShadowRight;
         float mShadowBottom;
 
+        boolean mOptShadowCorner;
+        float mOptShadowSize;
+
         ShadowState(float shadowLeft, float shadowTop, float shadowRight, float shadowBottom) {
             super();
             setShadowSize(shadowLeft, shadowTop, shadowRight, shadowBottom);
         }
 
         void updateMaskFilter() {
+
             float radius = mShadowLeft;
             if (mShadowTop > radius) {
                 radius = mShadowTop;
@@ -132,6 +146,7 @@ final class ShadowEffect extends AbstractEffect<ShadowEffect.ShadowState> {
             if (mShadowBottom > radius) {
                 radius = mShadowBottom;
             }
+            radius += calShadowInset();
             mPaint.setMaskFilter(new BlurMaskFilter(radius, BlurMaskFilter.Blur.OUTER));
         }
 
@@ -143,6 +158,16 @@ final class ShadowEffect extends AbstractEffect<ShadowEffect.ShadowState> {
             mShadowTop = orig.mShadowTop;
             mShadowRight = orig.mShadowRight;
             mShadowBottom = orig.mShadowBottom;
+            mOptShadowCorner = orig.mOptShadowCorner;
+            mOptShadowSize = orig.mOptShadowSize;
+        }
+
+        float calShadowInset() {
+            if (mOptShadowCorner) {
+                return mOptShadowSize;
+            } else {
+                return 1f;//偏移1像素，用于修正计算可能造成的精度丢失导致阴影和边框之间可能存在缝隙：没实际测试过，偏移1像素不会造成其他问题
+            }
         }
 
         @SuppressLint("NewApi")

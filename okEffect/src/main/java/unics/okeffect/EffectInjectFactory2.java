@@ -1,4 +1,4 @@
-package unics.leanback.effect;
+package unics.okeffect;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import unics.leanback.effect.R;
 
 /**
  * Create by luochao
@@ -88,6 +90,12 @@ public class EffectInjectFactory2 implements LayoutInflater.Factory2 {
         return view;
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull String name, @NonNull Context context, @NonNull AttributeSet attrs) {
+        return onCreateView(null, name, context, attrs);
+    }
+
     private void tryInjectEffect(@NonNull View view, @NonNull Context context, @NonNull AttributeSet attrs) {
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.EffectDrawable, R.attr.effectDrawableStyle, Effects.defaultEffectDrawableStyleRes);
         if (ta.getBoolean(R.styleable.EffectDrawable_ed_inject, false)) {
@@ -104,11 +112,5 @@ public class EffectInjectFactory2 implements LayoutInflater.Factory2 {
             view.setPadding(pl, pt, pr, pb);
         }
         ta.recycle();
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull String name, @NonNull Context context, @NonNull AttributeSet attrs) {
-        return onCreateView(null, name, context, attrs);
     }
 }

@@ -1,4 +1,4 @@
-package unics.leanback.effect;
+package unics.okeffect;
 
 import android.graphics.Rect;
 import android.graphics.drawable.NinePatchDrawable;
@@ -51,6 +51,11 @@ public interface EffectParams {
     int getStrokeColor();
 
     /**
+     * 是否优化边框远角处的绘制
+     */
+    boolean optStrokeCorner();
+
+    /**
      * 内容与边框之间的间距
      */
     @Px
@@ -87,6 +92,7 @@ public interface EffectParams {
         float mShadowTop;
         float mShadowBottom;
         float mStrokeSize;
+        boolean mOptStrokeCorner;
         int mStrokeColor;
         float mContentGap;
         float mCornerRadius;
@@ -95,6 +101,7 @@ public interface EffectParams {
         public CommonParams(Effects.Builder<?, ?> builder) {
             mStrokeSize = builder.mStrokeSize;
             mStrokeColor = builder.mStrokeColor;
+            mOptStrokeCorner = builder.mOptStrokeCorner;
             mContentGap = builder.mContentGap;
             mCornerRadius = builder.mCornerRadius;
             mCornerRadii = builder.mCornerRadii;
@@ -128,6 +135,11 @@ public interface EffectParams {
         @Override
         public int getStrokeColor() {
             return mStrokeColor;
+        }
+
+        @Override
+        public boolean optStrokeCorner() {
+            return mOptStrokeCorner;
         }
 
         @Override
