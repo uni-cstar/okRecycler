@@ -40,9 +40,15 @@ public class LauncherActivity extends Activity {
         });
         linearLayout.addView(btn);
         addBtn(linearLayout, "启动测试界面", v -> {
-            Intent it = new Intent(LauncherActivity.this, EffectSampleActivity.class);
+//            Intent it = new Intent(LauncherActivity.this, EffectSampleActivity.class);
+//            startActivity(it);
+        });
+
+        addBtn(linearLayout, "GridView", v -> {
+            Intent it = new Intent(LauncherActivity.this, GridSampleActivity.class);
             startActivity(it);
         });
+
 
         setContentView(linearLayout);
     }

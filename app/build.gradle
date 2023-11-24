@@ -50,8 +50,9 @@ dependencies {
     implementation project(path: ':rva')
     implementation project(path: ':rval')
     implementation project(path: ':okEffect')
-    implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.leanback:leanback:1.0.0'
+
 
 //
 //    implementation 'androidx.core:core-ktx:1.8.0'
