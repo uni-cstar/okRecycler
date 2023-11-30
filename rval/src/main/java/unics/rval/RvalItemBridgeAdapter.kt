@@ -9,6 +9,7 @@ import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.PresenterSelector
 import androidx.leanback.widget.SinglePresenterSelector
 import androidx.recyclerview.widget.RecyclerView
+import java.util.Collections
 
 class RvalItemBridgeAdapter private constructor(
     private val arrayObjectAdapter: ArrayObjectAdapter,
@@ -120,6 +121,14 @@ class RvalItemBridgeAdapter private constructor(
 
     fun indexOf(item: Any): Int {
         return arrayObjectAdapter.indexOf(item)
+    }
+
+    fun indexOf(filter: (Any) -> Boolean): Int {
+        return arrayObjectAdapter.unmodifiableList<Any>().indexOfFirst(filter)
+    }
+
+    fun <E> unmodifiableList(): List<E> {
+        return arrayObjectAdapter.unmodifiableList()
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {

@@ -20,7 +20,7 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep public class unics.okeffect.**{
+-keep public class unics.dutils.**{
     public *;
     protected * ;
 }

@@ -1,23 +1,16 @@
 package unics.rval
 
+import android.annotation.SuppressLint
 import android.util.SparseArray
-import android.view.FocusFinder
-import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.leanback.widget.BaseGridView
-import androidx.leanback.widget.GridViewFocusSearchHelper
-import androidx.leanback.widget.HorizontalGridView
-import androidx.leanback.widget.HorizontalGridViewFocusSearchHelper
 import androidx.leanback.widget.Presenter
-import androidx.leanback.widget.VerticalGridView
-import androidx.leanback.widget.VerticalGridViewFocusSearchHelper
 import androidx.recyclerview.widget.RecyclerView
 import unics.rva.utils.EventHolder
 import unics.rva.utils.canTakeFocusCompat
-import unics.rva.utils.findContainingRecyclerView
 import unics.rva.utils.forEach
 import unics.rva.utils.throttleClick
 
@@ -64,6 +57,10 @@ open class RvalPresenter() : Presenter() {
      * 默认获取焦点的item位置（只在第一次显示该item时请求焦点）
      */
     var defaultFocusedAdapterPosition: Int = -1
+        set(value) {
+            field = value
+            handleDefaultFocusPosition()
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup): RvalViewHolder {
         val creator = itemCreator ?: itemCreatorByLayoutId
@@ -80,6 +77,11 @@ open class RvalPresenter() : Presenter() {
         viewHolder as RvalViewHolder
         viewHolder.bindModel(item)
         viewHolder.bindRecyclerView(attachedRecyclerView)
+        //处理默认焦点位置
+        if (defaultFocusedAdapterPosition >= 0 && viewHolder.view.canTakeFocusCompat() && defaultFocusedAdapterPosition == viewHolder.getAdapterPositionUnsafe()) {
+            viewHolder.view.requestFocus()
+            defaultFocusedAdapterPosition = -1
+        }
         itemBinder?.invoke(viewHolder)
     }
 
@@ -94,16 +96,6 @@ open class RvalPresenter() : Presenter() {
             viewHolder as RvalViewHolder
             viewHolder.bindModel(item)
             itemPayloadsBinder!!.invoke(viewHolder, payloads)
-        }
-
-        //处理默认焦点位置
-        if (defaultFocusedAdapterPosition >= 0 && viewHolder.view.canTakeFocusCompat()) {
-            val recyclerView = viewHolder.view.findContainingRecyclerView() ?: return
-            val vh = recyclerView.findContainingViewHolder(viewHolder.view) ?: return
-            if (vh.adapterPosition == defaultFocusedAdapterPosition) {
-                viewHolder.view.requestFocus()
-                defaultFocusedAdapterPosition = -1
-            }
         }
     }
 
@@ -330,11 +322,23 @@ open class RvalPresenter() : Presenter() {
 
     internal fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         attachedRecyclerView = recyclerView
+        handleDefaultFocusPosition()
     }
 
     internal fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         if (attachedRecyclerView == recyclerView) {
             attachedRecyclerView = null
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun handleDefaultFocusPosition() {
+        if (defaultFocusedAdapterPosition < 0)
+            return
+        (attachedRecyclerView as? BaseGridView)?.let { rv ->
+            if (rv.selectedPosition == RecyclerView.NO_POSITION && rv.focusScrollStrategy == BaseGridView.FOCUS_SCROLL_ALIGNED) {
+                rv.selectedPosition = defaultFocusedAdapterPosition
+            }
         }
     }
 
