@@ -18,7 +18,7 @@ internal class GridViewCompat<T : BaseGridView>(
     private val callback: Callback
 ) {
 
-    companion object{
+    companion object {
         /**
          * 推荐的按键分发时间间隔
          */
@@ -57,7 +57,7 @@ internal class GridViewCompat<T : BaseGridView>(
      */
     var keyEventDispatchMinTime: Long = -1
 
-    private var lastKeyEventDispatchTime:Long = -1
+    private var lastKeyEventDispatchTime: Long = -1
 
     fun dispatchKeyEvent(event: KeyEvent): Boolean {
         val updateTime = SystemClock.uptimeMillis()
@@ -66,10 +66,16 @@ internal class GridViewCompat<T : BaseGridView>(
             && event.repeatCount != 0
             && updateTime - lastKeyEventDispatchTime < keyEventDispatchMinTime
         ) {
-            Log.i(TAG, "dispatchKeyEvent: 忽略keyEvent ${gridView.scrollState == RecyclerView.SCROLL_STATE_IDLE}")
+            Log.i(
+                TAG,
+                "dispatchKeyEvent: 忽略keyEvent ${gridView.scrollState == RecyclerView.SCROLL_STATE_IDLE}"
+            )
             true
         } else {
-            Log.i(TAG, "dispatchKeyEvent: 触发super ${gridView.scrollState == RecyclerView.SCROLL_STATE_IDLE}")
+            Log.i(
+                TAG,
+                "dispatchKeyEvent: 触发super ${gridView.scrollState == RecyclerView.SCROLL_STATE_IDLE}"
+            )
             lastKeyEventDispatchTime = updateTime
             callback.superDispatchKeyEvent(event)
         }
@@ -78,12 +84,11 @@ internal class GridViewCompat<T : BaseGridView>(
     fun focusSearch(focused: View?, direction: Int): View? {
         val next = findNextFocus(focused, direction)
         if (next == null || next == focused) {
-            logd { "执行shake动画 ${gridView.getChildAdapterPosition(focused!!)} next=$next focused=$focused" }
-            if (boundaryShakeEnable) {
+            if (!handleBoundaryKeyListener(focused, direction) && boundaryShakeEnable) {
                 handleBoundaryAnimation(focused, direction)
+                logd { "执行shake动画 ${gridView.getChildAdapterPosition(focused!!)} next=$next focused=$focused" }
             }
         }
-
         return next
     }
 
@@ -103,21 +108,16 @@ internal class GridViewCompat<T : BaseGridView>(
             logd { "un need focus search opt: focused=$focused next=$next" }
             return next
         }
-        next = focusSearchHelper.focusSearch(focused, direction)
-        if (next == null || next == focused) {
-            //boundary key listener
-            if (focused != null)
-                boundaryKeyListener?.onBoundary(gridView.findContainingItemView(focused), direction)
-        }
-        return next
+        return focusSearchHelper.focusSearch(focused, direction)
     }
 
     /**
      * @param direction  One of View.FOCUS_UP, View.FOCUS_DOWN, View.FOCUS_LEFT, View.FOCUS_RIGHT, View.FOCUS_FORWARD, View.FOCUS_BACKWARD or 0 for not applicable.
      */
-    private fun handleBoundaryKeyListener(focused: View?, direction: Int) {
-        focused ?: return
-        boundaryKeyListener?.onBoundary(gridView.findContainingItemView(focused), direction)
+    private fun handleBoundaryKeyListener(focused: View?, direction: Int): Boolean {
+        focused ?: return false
+        return boundaryKeyListener?.onBoundary(gridView.findContainingItemView(focused), direction)
+            ?: false
     }
 
     private inline fun logd(msg: () -> String) {

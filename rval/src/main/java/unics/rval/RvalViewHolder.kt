@@ -41,6 +41,10 @@ open class RvalViewHolder(view: View) : Presenter.ViewHolder(view) {
     }
 
     @CallSuper
+    open fun unbind() {
+        this._data = null
+    }
+    @CallSuper
     fun bindRecyclerView(recyclerView: RecyclerView?) {
         _attachedRv = recyclerView
     }

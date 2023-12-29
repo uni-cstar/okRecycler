@@ -11,7 +11,7 @@ import androidx.leanback.widget.VerticalGridView
  * Create by luochao
  * on 2023/10/30
  */
-class RvalVerticalGridView @JvmOverloads constructor(
+open class RvalVerticalGridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : VerticalGridView(context, attrs), GridViewCompat.Callback {
 

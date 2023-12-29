@@ -102,6 +102,7 @@ open class RvalPresenter() : Presenter() {
     override fun onUnbindViewHolder(viewHolder: ViewHolder?) {
         if (viewHolder !is RvalViewHolder) return
         itemUnbinder?.invoke(viewHolder)
+        viewHolder.unbind()
     }
 
     /**

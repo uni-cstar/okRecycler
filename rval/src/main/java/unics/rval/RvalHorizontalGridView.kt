@@ -11,7 +11,7 @@ import androidx.leanback.widget.HorizontalGridView
  * Create by luochao
  * on 2023/10/30
  */
-class RvalHorizontalGridView @JvmOverloads constructor(
+open class RvalHorizontalGridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : HorizontalGridView(context, attrs), GridViewCompat.Callback {
 

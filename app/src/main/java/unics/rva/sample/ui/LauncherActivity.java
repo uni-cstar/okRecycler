@@ -2,7 +2,9 @@ package unics.rva.sample.ui;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,12 +31,14 @@ public class LauncherActivity extends Activity {
             @Override
             public void onClick(View v) {
                 try{
+                    WifiManager wifiManager = (WifiManager) LauncherActivity.this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                    wifiManager.setWifiEnabled(true);
                     Intent it = new Intent();
                     it.setComponent(new ComponentName("com.xinjing.launcher","com.xinjing.launcher.home.HomeActivity"));
                     it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(it);
                 }catch (Exception e){
-                    Toast.makeText(LauncherActivity.this,"启动乐家桌面失败",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LauncherActivity.this,"启动乐家桌面失败:" + e,Toast.LENGTH_SHORT).show();
                 }
             }
         });
