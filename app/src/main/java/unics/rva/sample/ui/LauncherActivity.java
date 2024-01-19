@@ -26,7 +26,7 @@ public class LauncherActivity extends Activity {
         LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         Button btn = new Button(this);
-        btn.setText("启动乐家桌面");
+        btn.setText("启动投影");
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -34,7 +34,7 @@ public class LauncherActivity extends Activity {
                     WifiManager wifiManager = (WifiManager) LauncherActivity.this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                     wifiManager.setWifiEnabled(true);
                     Intent it = new Intent();
-                    it.setComponent(new ComponentName("com.xinjing.launcher","com.xinjing.launcher.home.HomeActivity"));
+                    it.setComponent(new ComponentName("com.xinjing.projector","com.xinjing.projector.ui.home.HomeActivity"));
                     it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(it);
                 }catch (Exception e){

@@ -44,6 +44,7 @@ open class RvalViewHolder(view: View) : Presenter.ViewHolder(view) {
     open fun unbind() {
         this._data = null
     }
+
     @CallSuper
     fun bindRecyclerView(recyclerView: RecyclerView?) {
         _attachedRv = recyclerView
@@ -86,12 +87,22 @@ open class RvalViewHolder(view: View) : Presenter.ViewHolder(view) {
         }
     }
 
-    fun setVisibleOrNot(vid: Int, visible: Boolean) {
+    fun setVisible(vid: Int, visible: Boolean) {
         getViewOrNull<View>(vid)?.let {
             if (visible) {
                 it.visibility = View.VISIBLE
             } else {
                 it.visibility = View.GONE
+            }
+        }
+    }
+
+    fun setVisibleOrNot(vid: Int, visible: Boolean) {
+        getViewOrNull<View>(vid)?.let {
+            if (visible) {
+                it.visibility = View.VISIBLE
+            } else {
+                it.visibility = View.INVISIBLE
             }
         }
     }

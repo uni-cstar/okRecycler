@@ -3,6 +3,7 @@ package unics.rval
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.ClassPresenterSelector
 import androidx.leanback.widget.DiffCallback
+import androidx.leanback.widget.FocusHighlightHelper
 import androidx.leanback.widget.ItemBridgeAdapter
 import androidx.leanback.widget.ObjectAdapter
 import androidx.leanback.widget.Presenter
@@ -27,6 +28,17 @@ class RvalItemBridgeAdapter private constructor(
         ArrayObjectAdapter(presenterSelector),
         presenterSelector
     )
+
+    fun setupHeaderItemFocusHighlight(scaleEnabled: Boolean = true) {
+        FocusHighlightHelper.setupHeaderItemFocusHighlight(this, scaleEnabled)
+    }
+
+    fun setupBrowseItemFocusHighlight(
+        zoomIndex: Int,
+        useDimmer: Boolean = false
+    ) {
+        FocusHighlightHelper.setupBrowseItemFocusHighlight(this, zoomIndex, useDimmer)
+    }
 
     override fun setAdapter(adapter: ObjectAdapter?) {
         throw RuntimeException("不允许修改ObjectAdapter，内部已提供实现")
