@@ -1,3 +1,5 @@
+
+//note:包名不能改，否则无法访问执行包内访问操作
 package androidx.leanback.widget
 
 import android.graphics.Rect
@@ -17,8 +19,8 @@ import unics.rva.utils.canTakeFocusCompat
 internal abstract class GridViewFocusSearchHelper<T : BaseGridView>(val gridView: T) {
 
     protected var isRtl: Boolean
-//    protected var focusOutFront: Boolean = false
-//    protected var focusOutEnd: Boolean = false
+    protected var focusOutFront: Boolean = false
+    protected var focusOutEnd: Boolean = false
 
     //是否允许焦点转移
     protected var focusOutSideStart: Boolean = true
@@ -31,16 +33,19 @@ internal abstract class GridViewFocusSearchHelper<T : BaseGridView>(val gridView
         isRtl =
             gridView.context.resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
         orientation = if (gridView is HorizontalGridView) HORIZONTAL else VERTICAL
+        onLayoutManagerChanged()
+    }
+
+    internal fun onLayoutManagerChanged() {
         try {
             val layoutManager = gridView.layoutManager
-            if (layoutManager == null
-                || layoutManager !is GridLayoutManager
+            if (layoutManager == null || layoutManager !is GridLayoutManager
             ) {
                 isEnable = false
             } else {
                 isEnable = true
-//                focusOutFront = layoutManager.mFlag and GridLayoutManager.PF_FOCUS_OUT_FRONT != 0
-//                focusOutEnd = layoutManager.mFlag and GridLayoutManager.PF_FOCUS_OUT_END != 0
+                focusOutFront = layoutManager.mFlag and GridLayoutManager.PF_FOCUS_OUT_FRONT != 0
+                focusOutEnd = layoutManager.mFlag and GridLayoutManager.PF_FOCUS_OUT_END != 0
                 focusOutSideStart =
                     layoutManager.mFlag and GridLayoutManager.PF_FOCUS_OUT_SIDE_START != 0
                 focusOutSideEnd =
@@ -61,6 +66,8 @@ internal abstract class GridViewFocusSearchHelper<T : BaseGridView>(val gridView
         return layoutManager
     }
 
+    protected val itemCount: Int get() = gridView.adapter?.itemCount ?: 0
+
     protected abstract fun getNextFocusAdapterPosition(
         currentAdapterPosition: Int,
         direction: Int
@@ -70,7 +77,48 @@ internal abstract class GridViewFocusSearchHelper<T : BaseGridView>(val gridView
         isRtl = layoutDirection == View.LAYOUT_DIRECTION_RTL
     }
 
-    protected val itemCount: Int get() = gridView.adapter?.itemCount ?: 0
+    /**
+     * 寻焦优化
+     * @param focused 当前获取焦点的view
+     * @param direction 寻焦方向
+     * @param next 调用[gridView#focusSearch]查询到的结果
+     */
+    fun optFocusSearch(focused: View?, direction: Int, next: View?): View? {
+        if (gridView.isFocusSearchDisabled || !isEnable) {
+            logd { "optFocusSearch disabled,return next($next).(isFocusSearchDisabled=${gridView.isFocusSearchDisabled} isEnable=$isEnable)" }
+            return next
+        }
+
+        if (next == null || next == focused || next == gridView) {
+            logd { "optFocusSearch next == null || next == focused || next == gridView,performFocusSearch" }
+            return performFocusSearch(focused, direction, next)
+        }
+
+
+        if (gridView is VerticalGridView) {
+            if (((direction == View.FOCUS_UP && focusOutFront)
+                        || (direction == View.FOCUS_DOWN && focusOutEnd)
+                        || (direction == View.FOCUS_LEFT && focusOutSideStart)
+                        || (direction == View.FOCUS_RIGHT && focusOutSideEnd)) && gridView.findContainingViewHolder(
+                    next
+                ) == null
+            ) {
+                return performFocusSearch(focused, direction, next)
+            }
+        } else {
+            if (((direction == View.FOCUS_UP && focusOutSideStart)
+                        || (direction == View.FOCUS_DOWN && focusOutSideEnd)
+                        || (direction == View.FOCUS_LEFT && focusOutFront)
+                        || (direction == View.FOCUS_RIGHT && focusOutEnd)) && gridView.findContainingViewHolder(
+                    next
+                ) == null
+            ) {
+                return performFocusSearch(focused, direction, next)
+            }
+        }
+        return next
+    }
+
 
     private fun findFirstFocusableChild(): View? {
         for (i in 0 until gridView.childCount) {
@@ -83,45 +131,50 @@ internal abstract class GridViewFocusSearchHelper<T : BaseGridView>(val gridView
 
     /**
      * 执行寻焦优化
+     * @param superNext Group预先找到的下一个焦点
      */
-    private fun invokeFocusSearchOpt(focused: View?, direction: Int): View? {
+    private fun performFocusSearch(focused: View?, direction: Int, superNext: View?): View? {
         if (focused == null) {
-            return findFirstFocusableChild()
+            return superNext ?: findFirstFocusableChild()
         }
         val itemView = gridView.findContainingItemView(focused)
         if (itemView == null) {
-            logd("[focusSearch] findContainingItemView == null，return next.")
-            return null
+            logd { "[focusSearch] findContainingItemView == null，return next." }
+            return superNext
         }
         val focusedAdapterPosition = gridView.getChildAdapterPosition(itemView)
         if (focusedAdapterPosition == NO_POSITION) {
             //no position 直接返回
-            logd("[focusSearch] getChildAdapterPosition(itemView) == NO_POSITION，return next.")
-            return null
+            logd { "[focusSearch] getChildAdapterPosition(itemView) == NO_POSITION，return next." }
+            return superNext
         }
 
-        logd("[focusSearch] getChildAdapterPosition(itemView) ==${focusedAdapterPosition},continue)")
+        logd { "[focusSearch] getChildAdapterPosition(itemView) ==${focusedAdapterPosition},continue)" }
         val nextFocusAdapterPosition =
             getNextFocusAdapterPosition(focusedAdapterPosition, direction)
         if (nextFocusAdapterPosition == focusedAdapterPosition || nextFocusAdapterPosition == NO_POSITION) {
-            logd("[focusSearch] :nextFocusAdapterPosition == ${nextFocusAdapterPosition}, focusedAdapterPosition=$focusedAdapterPosition interrupt )")
-            return null
+            logd { "[focusSearch] :nextFocusAdapterPosition == ${nextFocusAdapterPosition}, focusedAdapterPosition=$focusedAdapterPosition interrupt )" }
+            return superNext
         }
 
-        logd("[focusSearch] :nextFocusAdapterPosition ==${nextFocusAdapterPosition},continue)")
+        logd { "[focusSearch] :nextFocusAdapterPosition ==${nextFocusAdapterPosition},continue)" }
         val nextChildViewHolder =
             gridView.findViewHolderForAdapterPosition(nextFocusAdapterPosition)
         return if (nextChildViewHolder == null) {
-            logd("[focusSearch] :nextChildViewHolder == null,interrupt )")
-            null
+            logd { "[focusSearch] :nextChildViewHolder == null,interrupt )" }
+            superNext
         } else {
             nextChildViewHolder.itemView
         }
     }
 
-    fun focusSearch(focused: View?, direction: Int): View? {
+    /**
+     * @param superNext 调用super
+     */
+    @Deprecated("方法没有意义，里面的判断很return null的情况外层实际已经处理了", replaceWith = ReplaceWith("optFocusSearch(focused,direction,superNext)"))
+    fun focusSearch(focused: View?, direction: Int, superNext: View?): View? {
         if (gridView.isFocusSearchDisabled)
-            return null
+            return superNext
 
         if (gridView is VerticalGridView) {
             //开始侧可以焦点移除，不做处理
@@ -147,15 +200,15 @@ internal abstract class GridViewFocusSearchHelper<T : BaseGridView>(val gridView
         //在gridView中查找下一个可获取焦点的view
         val next = FocusFinder.getInstance().findNextFocus(gridView, focused, direction)
         return if (next == null || next == gridView || next == focused) {
-            logd("[focusSearch] FocusFinder find null next, invokeFocusSearchOpt. (focused=${focused})")
-            invokeFocusSearchOpt(focused, direction)
+            logd { "[focusSearch] FocusFinder find null next, invokeFocusSearchOpt. (focused=${focused})" }
+            performFocusSearch(focused, direction, superNext)
         } else {
             next
         }
     }
 
-    private inline fun logd(msg: String) {
-        Log.d(TAG, msg)
+    private inline fun logd(msg: () -> String) {
+        Log.d(TAG, msg())
     }
 
     companion object {

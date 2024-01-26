@@ -82,8 +82,9 @@ internal class GridViewCompat<T : BaseGridView>(
     }
 
     fun focusSearch(focused: View?, direction: Int): View? {
+        logd { "invoke focusSearch(focused=$focused,direction=$direction)" }
         val next = findNextFocus(focused, direction)
-        if (next == null || next == focused) {
+        if (next == null || next == focused) {//todo：解决下一个问题的方案可以考虑采用判断layout是否正在布局或者是否处于滑动中
             if (!handleBoundaryKeyListener(focused, direction) && boundaryShakeEnable) {
                 handleBoundaryAnimation(focused, direction)
                 logd { "执行shake动画 ${gridView.getChildAdapterPosition(focused!!)} next=$next focused=$focused" }
@@ -103,12 +104,12 @@ internal class GridViewCompat<T : BaseGridView>(
     }
 
     private fun findNextFocus(focused: View?, direction: Int): View? {
-        var next = callback.superFocusSearch(focused, direction)
-        if (!focusSearchOptimization || gridView.isFocusSearchDisabled || (next != null && next != focused && next != gridView)) {
-            logd { "un need focus search opt: focused=$focused next=$next" }
+        val next = callback.superFocusSearch(focused, direction)
+        if (!focusSearchOptimization || gridView.isFocusSearchDisabled) {
+            logd { "focus search disabled ,return super find result =$next" }
             return next
         }
-        return focusSearchHelper.focusSearch(focused, direction)
+        return focusSearchHelper.optFocusSearch(focused, direction, next)
     }
 
     /**
