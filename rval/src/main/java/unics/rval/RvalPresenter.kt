@@ -39,7 +39,8 @@ open class RvalPresenter() : Presenter() {
     private var itemUnbinder: LrvaViewHolderCallback? = null
     private var itemClicker: EventHolder<OnViewClick>? = null
     private var itemKeyListener: OnViewKeyEvent? = null
-//    private var itemKeyBoundaryListener: OnViewKeyEvent? = null
+
+    //    private var itemKeyBoundaryListener: OnViewKeyEvent? = null
     private val itemChildClickersLazy = lazy {
         SparseArray<EventHolder<OnViewClick>>(5)
     }
@@ -62,6 +63,12 @@ open class RvalPresenter() : Presenter() {
             handleDefaultFocusPosition()
         }
 
+    /**
+     * 默认请求焦点时，是否采用延迟，默认不延迟
+     * @see defaultFocusedAdapterPosition
+     */
+    var defaultFocusedRequestDelay: Long = -1
+
     override fun onCreateViewHolder(parent: ViewGroup): RvalViewHolder {
         val creator = itemCreator ?: itemCreatorByLayoutId
         require(creator != null) {
@@ -78,11 +85,36 @@ open class RvalPresenter() : Presenter() {
         viewHolder.bindModel(item)
         viewHolder.bindRecyclerView(attachedRecyclerView)
         //处理默认焦点位置
-        if (defaultFocusedAdapterPosition >= 0 && viewHolder.view.canTakeFocusCompat() && defaultFocusedAdapterPosition == viewHolder.getAdapterPositionUnsafe()) {
-            viewHolder.view.requestFocus()
-            defaultFocusedAdapterPosition = -1
+        if (defaultFocusedAdapterPosition >= 0 && defaultFocusedAdapterPosition == viewHolder.getAdapterPositionUnsafe()) {
+            val itemView = viewHolder.view
+            if (itemView is ViewGroup) {
+                if (itemView.canTakeFocusCompat()) {
+                    requestDefaultFocus(itemView)
+                    defaultFocusedAdapterPosition = -1
+                } else {
+                    val list = arrayListOf<View>()
+                    itemView.addFocusables(list, View.FOCUS_DOWN)
+                    list.firstOrNull()?.let {
+                        requestDefaultFocus(it)
+                        defaultFocusedAdapterPosition = -1
+                    }
+                }
+            } else if (itemView.canTakeFocusCompat()) {
+                requestDefaultFocus(itemView)
+                defaultFocusedAdapterPosition = -1
+            }
         }
         itemBinder?.invoke(viewHolder)
+    }
+
+    private fun requestDefaultFocus(view: View) {
+        if (defaultFocusedRequestDelay > 0) {
+            view.postDelayed({
+                view.requestFocus()
+            }, defaultFocusedRequestDelay)
+        } else {
+            view.requestFocus()
+        }
     }
 
     override fun onBindViewHolder(

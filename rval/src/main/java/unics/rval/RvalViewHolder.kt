@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.TextView.BufferType
 import androidx.annotation.CallSuper
 import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.leanback.widget.Presenter
 import androidx.recyclerview.widget.RecyclerView
 import unics.rva.utils.findContainingRecyclerView
@@ -20,16 +22,11 @@ open class RvalViewHolder(view: View) : Presenter.ViewHolder(view) {
     inline val context: Context get() = view.context
 
     constructor(parent: ViewGroup, layoutId: Int, attachToRoot: Boolean = false) : this(
-        LayoutInflater.from(parent.context),
-        parent,
-        layoutId, attachToRoot
+        LayoutInflater.from(parent.context), parent, layoutId, attachToRoot
     )
 
     constructor(
-        inflater: LayoutInflater,
-        parent: ViewGroup,
-        layoutId: Int,
-        attachToRoot: Boolean = false
+        inflater: LayoutInflater, parent: ViewGroup, layoutId: Int, attachToRoot: Boolean = false
     ) : this(inflater.inflate(layoutId, parent, attachToRoot))
 
     /**
@@ -73,6 +70,18 @@ open class RvalViewHolder(view: View) : Presenter.ViewHolder(view) {
 
     fun setText(@IdRes viewId: Int, value: CharSequence?): RvalViewHolder {
         getView<TextView>(viewId).text = value
+        return this
+    }
+
+    inline fun setText(@IdRes viewId: Int, @StringRes stringRes: Int): RvalViewHolder {
+        getView<TextView>(viewId).setText(stringRes)
+        return this
+    }
+
+    inline fun setText(
+        @IdRes viewId: Int, @StringRes stringRes: Int, type: BufferType
+    ): RvalViewHolder {
+        getView<TextView>(viewId).setText(stringRes, type)
         return this
     }
 

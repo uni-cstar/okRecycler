@@ -10,7 +10,6 @@ import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.PresenterSelector
 import androidx.leanback.widget.SinglePresenterSelector
 import androidx.recyclerview.widget.RecyclerView
-import java.util.Collections
 
 class RvalItemBridgeAdapter private constructor(
     private val arrayObjectAdapter: ArrayObjectAdapter,
