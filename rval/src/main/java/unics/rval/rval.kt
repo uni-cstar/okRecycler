@@ -62,7 +62,7 @@ inline fun RecyclerView.rvalSingle(
  */
 fun RecyclerView.rvalSingle(presenterSelector: PresenterSelector): RvalItemBridgeAdapter {
     val adapter = RvalItemBridgeAdapter(presenterSelector)
-    if (this !is BaseGridView)
+    if (this !is BaseGridView && layoutManager == null)
         this.layoutManager = LinearLayoutManager(this.context)
     this.adapter = adapter
     return adapter
