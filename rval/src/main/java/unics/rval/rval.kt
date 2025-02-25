@@ -8,6 +8,7 @@ import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.PresenterSelector
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import unics.rval.presenter.RvalPresenter
 
 /**
  * 初始化
@@ -15,8 +16,9 @@ import androidx.recyclerview.widget.RecyclerView
  */
 fun RecyclerView.rval(setup: RvalItemBridgeAdapter.() -> Unit): RvalItemBridgeAdapter {
     val adapter = RvalItemBridgeAdapter()
-    if (this !is BaseGridView)
+    if (this !is BaseGridView && layoutManager == null) {
         this.layoutManager = LinearLayoutManager(this.context)
+    }
     setup.invoke(adapter)
     this.adapter = adapter
     return adapter
@@ -28,8 +30,9 @@ fun RecyclerView.rval(setup: RvalItemBridgeAdapter.() -> Unit): RvalItemBridgeAd
  */
 fun RecyclerView.rvalSingle(presenter: Presenter): RvalItemBridgeAdapter {
     val adapter = RvalItemBridgeAdapter(presenter)
-    if (this !is BaseGridView)
+    if (this !is BaseGridView && layoutManager == null) {
         this.layoutManager = LinearLayoutManager(this.context)
+    }
     this.adapter = adapter
     return adapter
 }
@@ -74,7 +77,7 @@ val RecyclerView.rval: RvalItemBridgeAdapter get() = this.adapter as RvalItemBri
  * 使用居中对齐（选中的item在中间）
  */
 @SuppressLint("RestrictedApi")
-fun BaseGridView.applyCenterAlignment(){
+fun BaseGridView.applyCenterAlignment() {
     focusScrollStrategy = BaseGridView.FOCUS_SCROLL_ALIGNED
     windowAlignment = BaseGridView.WINDOW_ALIGN_NO_EDGE
 }

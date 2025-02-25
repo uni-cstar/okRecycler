@@ -2,6 +2,7 @@ package unics.rval
 
 import android.view.KeyEvent
 import android.view.View
+import unics.rval.presenter.RvalViewHolder
 
 /**
  * Create by luochao

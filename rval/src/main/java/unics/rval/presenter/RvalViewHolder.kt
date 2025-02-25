@@ -1,4 +1,4 @@
-package unics.rval
+package unics.rval.presenter
 
 import android.content.Context
 import android.util.SparseArray
@@ -13,6 +13,7 @@ import androidx.annotation.StringRes
 import androidx.leanback.widget.Presenter
 import androidx.recyclerview.widget.RecyclerView
 import unics.rva.utils.findContainingRecyclerView
+import unics.rval.RvalItemBridgeAdapter
 
 open class RvalViewHolder(view: View) : Presenter.ViewHolder(view) {
 
