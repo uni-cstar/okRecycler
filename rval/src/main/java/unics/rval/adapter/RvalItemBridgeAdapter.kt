@@ -1,4 +1,4 @@
-package unics.rval
+package unics.rval.adapter
 
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.ClassPresenterSelector
@@ -12,6 +12,9 @@ import androidx.leanback.widget.SinglePresenterSelector
 import androidx.recyclerview.widget.RecyclerView
 import unics.rval.presenter.RvalPresenter
 
+/**
+ * ！！！ itemViewType根据presenter的位置来决定，并且很难破坏这个设计，因此最好不要随便改变这个设计
+ */
 class RvalItemBridgeAdapter private constructor(
     private val arrayObjectAdapter: ArrayObjectAdapter,
     private val presenterSelector: PresenterSelector
@@ -53,7 +56,7 @@ class RvalItemBridgeAdapter private constructor(
     }
 
     fun addClassPresenter(cls: Class<*>, presenter: Presenter): RvalItemBridgeAdapter {
-        if(presenterSelector !is ClassPresenterSelector)
+        if (presenterSelector !is ClassPresenterSelector)
             throw IllegalStateException("the presenter selector is not ClassPresenterSelector,cannot perform this action.")
         presenterSelector.addClassPresenter(cls, presenter)
         return this
@@ -84,8 +87,9 @@ class RvalItemBridgeAdapter private constructor(
     fun addAll(index: Int, items: Collection<*>) {
         arrayObjectAdapter.addAll(index, items)
     }
+
     fun addAll(items: Collection<*>) {
-        addAll(arrayObjectAdapter.size(),items)
+        addAll(arrayObjectAdapter.size(), items)
     }
 
     fun remove(item: Any): Boolean {
@@ -147,7 +151,7 @@ class RvalItemBridgeAdapter private constructor(
         super.onAttachedToRecyclerView(recyclerView)
 //        recyclerView.addOnUnhandledKeyEventListener()
         presenterSelector.presenters.forEach {
-            if(it is RvalPresenter){
+            if (it is RvalPresenter) {
                 it.onAttachedToRecyclerView(recyclerView)
             }
         }
@@ -156,7 +160,7 @@ class RvalItemBridgeAdapter private constructor(
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
         presenterSelector.presenters.forEach {
-            if(it is RvalPresenter){
+            if (it is RvalPresenter) {
                 it.onDetachedFromRecyclerView(recyclerView)
             }
         }

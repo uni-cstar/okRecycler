@@ -8,6 +8,7 @@ import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.PresenterSelector
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import unics.rval.adapter.RvalItemBridgeAdapter
 import unics.rval.presenter.RvalPresenter
 
 /**

@@ -87,7 +87,7 @@ internal class GridViewCompat<T : BaseGridView>(
         if (next == null || next == focused) {//todo：解决下一个问题的方案可以考虑采用判断layout是否正在布局或者是否处于滑动中
             if (!handleBoundaryKeyListener(focused, direction) && boundaryShakeEnable) {
                 handleBoundaryAnimation(focused, direction)
-                logd { "执行shake动画 ${gridView.getChildAdapterPosition(focused!!)} next=$next focused=$focused" }
+                logd { "执行shake动画 next=$next focused=$focused" }
             }
         }
         return next

@@ -1,4 +1,4 @@
-package unics.rval
+package unics.rval.adapter
 
 import android.view.KeyEvent
 import android.view.View

@@ -13,11 +13,11 @@ import unics.rva.utils.EventHolder
 import unics.rva.utils.canTakeFocusCompat
 import unics.rva.utils.forEach
 import unics.rva.utils.throttleClick
-import unics.rval.ItemPayloadsBindCallback
-import unics.rval.LrvaViewHolderCallback
-import unics.rval.OnViewClick
-import unics.rval.OnViewFocusChange
-import unics.rval.OnViewKeyEvent
+import unics.rval.adapter.ItemPayloadsBindCallback
+import unics.rval.adapter.LrvaViewHolderCallback
+import unics.rval.adapter.OnViewClick
+import unics.rval.adapter.OnViewFocusChange
+import unics.rval.adapter.OnViewKeyEvent
 
 open class RvalPresenter() : Presenter() {
 
