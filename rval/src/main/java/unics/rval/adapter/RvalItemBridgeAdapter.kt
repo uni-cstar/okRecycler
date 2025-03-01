@@ -11,6 +11,7 @@ import androidx.leanback.widget.PresenterSelector
 import androidx.leanback.widget.SinglePresenterSelector
 import androidx.recyclerview.widget.RecyclerView
 import unics.rval.presenter.RvalPresenter
+import unics.rval.presenter.ZoomFactor
 
 /**
  * ！！！ itemViewType根据presenter的位置来决定，并且很难破坏这个设计，因此最好不要随便改变这个设计
@@ -37,6 +38,7 @@ class RvalItemBridgeAdapter private constructor(
     }
 
     fun setupBrowseItemFocusHighlight(
+        @ZoomFactor
         zoomIndex: Int,
         useDimmer: Boolean = false
     ) {
