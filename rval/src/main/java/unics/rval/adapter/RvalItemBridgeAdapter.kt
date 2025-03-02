@@ -110,13 +110,11 @@ class RvalItemBridgeAdapter private constructor(
         arrayObjectAdapter.replace(position, item)
     }
 
-    @JvmOverloads
-    fun replaceAll(items: List<*>?, diffCallback: DiffCallback<*>? = null) {
+    fun replaceAll(items: List<*>?, diffCallback: DiffCallback<*>?) {
         arrayObjectAdapter.setItems(items.orEmpty(), diffCallback)
     }
 
-    @JvmOverloads
-    fun setItems(items: List<*>?, diffCallback: DiffCallback<*>? = null) {
+    fun setItems(items: List<*>?, diffCallback: DiffCallback<*>?) {
         arrayObjectAdapter.setItems(items.orEmpty(), diffCallback)
     }
 
