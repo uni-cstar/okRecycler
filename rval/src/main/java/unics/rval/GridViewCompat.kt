@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import unics.rval.FocusDirection
 import unics.rval.RvalBoundaryKeyListener
 import unics.rval.shakeX
 import unics.rval.shakeY
@@ -115,7 +116,7 @@ internal class GridViewCompat<T : BaseGridView>(
     /**
      * @param direction  One of View.FOCUS_UP, View.FOCUS_DOWN, View.FOCUS_LEFT, View.FOCUS_RIGHT, View.FOCUS_FORWARD, View.FOCUS_BACKWARD or 0 for not applicable.
      */
-    private fun handleBoundaryKeyListener(focused: View?, direction: Int): Boolean {
+    private fun handleBoundaryKeyListener(focused: View?, @FocusDirection direction: Int): Boolean {
         focused ?: return false
         return boundaryKeyListener?.onBoundary(gridView.findContainingItemView(focused), direction)
             ?: false
