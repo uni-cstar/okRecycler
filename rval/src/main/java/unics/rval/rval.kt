@@ -74,6 +74,9 @@ fun RecyclerView.rvalSingle(presenterSelector: PresenterSelector): RvalItemBridg
  */
 val RecyclerView.rval: RvalItemBridgeAdapter get() = this.adapter as RvalItemBridgeAdapter
 
+val RecyclerView.rvalOrNull: RvalItemBridgeAdapter? get() = this.adapter as? RvalItemBridgeAdapter
+
+
 /**
  * 使用居中对齐（选中的item在中间）
  */
