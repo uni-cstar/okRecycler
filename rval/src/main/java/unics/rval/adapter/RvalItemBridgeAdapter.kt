@@ -1,6 +1,10 @@
 package unics.rval.adapter
 
+import android.annotation.SuppressLint
+import android.view.View
+import android.view.ViewGroup
 import androidx.leanback.widget.ArrayObjectAdapter
+import androidx.leanback.widget.BaseGridView
 import androidx.leanback.widget.ClassPresenterSelector
 import androidx.leanback.widget.DiffCallback
 import androidx.leanback.widget.FocusHighlightHelper
@@ -10,6 +14,7 @@ import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.PresenterSelector
 import androidx.leanback.widget.SinglePresenterSelector
 import androidx.recyclerview.widget.RecyclerView
+import unics.rva.utils.canTakeFocusCompat
 import unics.rval.presenter.RvalPresenter
 import unics.rval.presenter.ZoomFactor
 
@@ -20,6 +25,23 @@ class RvalItemBridgeAdapter private constructor(
     private val arrayObjectAdapter: ArrayObjectAdapter,
     private val presenterSelector: PresenterSelector
 ) : ItemBridgeAdapter() {
+
+    /**
+     * 默认获取焦点的item位置（只在第一次显示该item时请求焦点）
+     */
+    var defaultFocusedAdapterPosition: Int = -1
+        set(value) {
+            field = value
+            handleDefaultFocusPosition()
+        }
+
+    /**
+     * 默认请求焦点时，是否采用延迟，默认不延迟
+     * @see defaultFocusedAdapterPosition
+     */
+    var defaultFocusedRequestDelay: Long = -1
+
+    private var mAttachedRecyclerView: RecyclerView? = null
 
     constructor() : this(ArrayObjectAdapter(), ClassPresenterSelector())
 
@@ -149,6 +171,7 @@ class RvalItemBridgeAdapter private constructor(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+        this.mAttachedRecyclerView = recyclerView
 //        recyclerView.addOnUnhandledKeyEventListener()
         presenterSelector.presenters.forEach {
             if (it is RvalPresenter) {
@@ -159,9 +182,56 @@ class RvalItemBridgeAdapter private constructor(
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
+        this.mAttachedRecyclerView = null
         presenterSelector.presenters.forEach {
             if (it is RvalPresenter) {
                 it.onDetachedFromRecyclerView(recyclerView)
+            }
+        }
+    }
+
+    override fun onBind(viewHolder: ViewHolder?) {
+        super.onBind(viewHolder)
+        viewHolder ?: return
+        //处理默认焦点位置
+        if (defaultFocusedAdapterPosition >= 0 && defaultFocusedAdapterPosition == viewHolder.bindingAdapterPosition) {
+            val itemView = viewHolder.itemView
+            if (itemView is ViewGroup) {
+                if (itemView.canTakeFocusCompat()) {
+                    requestDefaultFocus(itemView)
+                    defaultFocusedAdapterPosition = -1
+                } else {
+                    val list = arrayListOf<View>()
+                    itemView.addFocusables(list, View.FOCUS_DOWN)
+                    list.firstOrNull()?.let {
+                        requestDefaultFocus(it)
+                        defaultFocusedAdapterPosition = -1
+                    }
+                }
+            } else if (itemView.canTakeFocusCompat()) {
+                requestDefaultFocus(itemView)
+                defaultFocusedAdapterPosition = -1
+            }
+        }
+    }
+
+    private fun requestDefaultFocus(view: View) {
+        if (defaultFocusedRequestDelay > 0) {
+            view.postDelayed({
+                view.requestFocus()
+            }, defaultFocusedRequestDelay)
+        } else {
+            view.requestFocus()
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun handleDefaultFocusPosition() {
+        if (defaultFocusedAdapterPosition < 0)
+            return
+        (mAttachedRecyclerView as? BaseGridView)?.let { rv ->
+            if (rv.selectedPosition == RecyclerView.NO_POSITION && rv.focusScrollStrategy == BaseGridView.FOCUS_SCROLL_ALIGNED) {
+                rv.selectedPosition = defaultFocusedAdapterPosition
             }
         }
     }
