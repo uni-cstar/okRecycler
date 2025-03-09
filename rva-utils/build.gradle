@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace 'unics.rva.utils'
-    compileSdk 33
+    compileSdk 32
 
     defaultConfig {
         minSdk 19
@@ -31,7 +31,7 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
 //
 //    implementation 'androidx.core:core-ktx:1.8.0'

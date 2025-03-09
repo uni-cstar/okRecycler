@@ -194,7 +194,7 @@ class RvalItemBridgeAdapter private constructor(
         super.onBind(viewHolder)
         viewHolder ?: return
         //处理默认焦点位置
-        if (defaultFocusedAdapterPosition >= 0 && defaultFocusedAdapterPosition == viewHolder.bindingAdapterPosition) {
+        if (defaultFocusedAdapterPosition >= 0 && defaultFocusedAdapterPosition == viewHolder.adapterPosition) {
             val itemView = viewHolder.itemView
             if (itemView is ViewGroup) {
                 if (itemView.canTakeFocusCompat()) {
