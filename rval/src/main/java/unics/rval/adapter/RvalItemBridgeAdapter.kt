@@ -205,8 +205,8 @@ class RvalItemBridgeAdapter private constructor(
                     itemView.addFocusables(list, View.FOCUS_DOWN)
                     list.firstOrNull()?.let {
                         requestDefaultFocus(it)
-                        defaultFocusedAdapterPosition = -1
                     }
+                    defaultFocusedAdapterPosition = -1
                 }
             } else if (itemView.canTakeFocusCompat()) {
                 requestDefaultFocus(itemView)
@@ -221,7 +221,10 @@ class RvalItemBridgeAdapter private constructor(
                 view.requestFocus()
             }, defaultFocusedRequestDelay)
         } else {
-            view.requestFocus()
+            view.post {
+                //还是得使用post方式，否则由于request focus时没有parent，导致无法触发global focus change，即无法addOnGlobalFocusChangeListener监听的回调不会执行
+                view.requestFocus()
+            }
         }
     }
 
