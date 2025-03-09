@@ -50,6 +50,12 @@ open class RvalPresenter() : Presenter() {
         SparseArray<EventHolder<OnViewClick>>(5)
     }
     private val itemChildClickers: SparseArray<EventHolder<OnViewClick>> by itemChildClickersLazy
+
+    private val itemChildKeyListenersLazy = lazy {
+        SparseArray<OnViewKeyEvent>(5)
+    }
+    private val itemChildKeyListeners: SparseArray<OnViewKeyEvent> by itemChildKeyListenersLazy
+
     private var itemFocusChanger: OnViewFocusChange? = null
     private var attachedRecyclerView: RecyclerView? = null
 //
@@ -220,6 +226,13 @@ open class RvalPresenter() : Presenter() {
         this.itemKeyListener = block
     }
 
+    /**
+     * 子view按键事件
+     */
+    fun itemChildKeyEvent(@IdRes viewId: Int, block: OnViewKeyEvent) {
+        this.itemChildKeyListeners.put(viewId, block)
+    }
+
 //    /**
 //     * 按键边界回调：在指定方向上找不到可获取焦点时回调
 //     */
@@ -250,6 +263,14 @@ open class RvalPresenter() : Presenter() {
                             block.invoke(holder, it)
                         }
                     }
+                }
+            }
+        }
+
+        if (itemChildKeyListenersLazy.isInitialized()) {
+            itemChildKeyListeners.forEach { key, value ->
+                holder.getViewOrNull<View>(key)?.setOnKeyListener { v, keyCode, event ->
+                    value.invoke(holder, keyCode, event)
                 }
             }
         }
