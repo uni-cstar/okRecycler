@@ -3,6 +3,9 @@ package unics.rval.presenter
 import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.PresenterSelector
 
+/**
+ * KV形式的映射关系提供对应的Presenter
+ */
 open class RvalMapPresenterSelector(private val keyProvider: (item: Any?) -> String) :
     PresenterSelector() {
 
