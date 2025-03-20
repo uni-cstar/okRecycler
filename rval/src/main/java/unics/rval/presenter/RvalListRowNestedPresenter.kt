@@ -7,7 +7,7 @@ import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.RowPresenter
 
 @SuppressLint("RestrictedApi")
-class RvalListRowNestedPresenter : RvalListRowPresenter {
+open class RvalListRowNestedPresenter : RvalListRowPresenter {
     var focusScrollStrategy = BaseGridView.FOCUS_SCROLL_ALIGNED
     var onInitialGridView: ((HorizontalGridView) -> Unit)? = null
 
@@ -35,9 +35,5 @@ class RvalListRowNestedPresenter : RvalListRowPresenter {
 //        vh.mItemBridgeAdapter.setAdapter(rowItem.adapter)
 //        vh.mGridView.adapter = vh.mItemBridgeAdapter
 //        vh.mGridView.contentDescription = rowItem.contentDescription
-    }
-
-    override fun isClippingChildren(): Boolean {
-        return super.isClippingChildren()
     }
 }
